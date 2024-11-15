@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Google Maps</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #description {
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+      }
+
+      #infowindow-content .title {
+        font-weight: bold;
+      }
+
+      #infowindow-content {
+        display: none;
+      }
+
+      #map #infowindow-content {
+        display: inline;
+      }
+
+      .pac-card {
+        margin: 10px 10px 0 0;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: #fff;
+        font-family: Roboto;
+      }
+
+      #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+      }
+
+      .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+      }
+
+      .pac-controls label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 25px;
+        font-weight: 300;
+        margin-left: 10px;
+        margin-top: 10px;
+        padding: 0 11px 0 15px;
+        text-overflow: ellipsis;
+        width: 260px;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+      #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+      }
+      #target {
+        width: 345px;
+      }
+    </style>
+</head>
+<body>
+<input id="pac-input" class="controls" type="text" placeholder="Search Box">
+<p id="status" hidden></p>
+<p id="latlng" hidden></p>
+<div id="map"></div>
+<script>
+
+      function initAutocomplete() {
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 40.8075, lng: -73.9626},
+          zoom: 13,
+          mapTypeId: 'roadmap'
+        });
+        
+
+
+        // Create the search box and link it to the UI element.
+        var input = document.getElementById('pac-input');
+        var defaultBounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(40.495330, -74.265051),
+          new google.maps.LatLng(40.910691, -73.744805)
+        );
+        map.fitBounds(defaultBounds);
+        var searchBox = new google.maps.places.SearchBox(input, {
+          bounds: defaultBounds
+        });
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+        searchBox.setBounds(defaultBounds);
+
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
+        });
+
+        var markers = [];
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+
+        searchBox.addListener('places_changed', function() {
+          var places = searchBox.getPlaces();
+          console.log(places);
+
+          if (places.length == 0) {
+            document.getElementById("status").innerHTML="";
+            document.getElementById("latlng").innerHTML="";
+            return;
+          }
+
+          // Clear out the old markers.
+          markers.forEach(function(marker) {
+            marker.setMap(null);
+          });
+          markers = [];
+
+          var bounds = new google.maps.LatLngBounds();
+
+          if(places.length == 1){
+            if (!places[0].geometry) {
+              console.log("Returned place contains no geometry");
+              document.getElementById("status").innerHTML="";
+              document.getElementById("latlng").innerHTML="";
+              return;
+            }
+
+            var icon = {
+              url: places[0].icon,
+              size: new google.maps.Size(71, 71),
+              origin: new google.maps.Point(0, 0),
+              anchor: new google.maps.Point(17, 34),
+              scaledSize: new google.maps.Size(25, 25)
+            };
+
+            // Create a marker for each place.
+            markers.push(marker = new google.maps.Marker({
+              map: map,
+              icon: icon,
+              title: places[0].name,
+              position: places[0].geometry.location
+            }));
+
+            if (places[0].geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(places[0].geometry.viewport);
+            } else {
+              bounds.extend(places[0].geometry.location);
+            }
+            document.getElementById("status").innerHTML=places[0].name;
+            document.getElementById("latlng").innerHTML=places[0].geometry.location;
+            
+            
+
+          }
+
+          else{  //no specific spot
+
+            // For each place, get the icon, name and location.
+            places.forEach(function(place) {
+              var spotname  = place.name;
+              var location = place.geometry.location;
+              //document.getElementById("status").innerHTML = spotname;
+              //document.getElementById("status").innerHTML = [spotname,location];
+              // current = JSON.stringify(place);
+              /*try {
+                document.getElementById("status").innerHTML = JSON.stringify(place);
+              }
+              catch (err) {
+                document.getElementById("status").innerHTML = err.message;
+              }*/
+              if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+              }
+              var icon = {
+                url: place.icon,
+                size: new google.maps.Size(71, 71),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 34),
+                scaledSize: new google.maps.Size(25, 25)
+              };
+
+              // Create a marker for each place.
+              markers.push(marker = new google.maps.Marker({
+                map: map,
+                icon: icon,
+                title: place.name,
+                position: place.geometry.location
+              }));
+
+              if (place.geometry.viewport) {
+                // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+              } else {
+                bounds.extend(place.geometry.location);
+              }
+
+              //Add listener
+              google.maps.event.addListener(marker, "click", function (event) {
+                //var latitude = event.latLng.lat();
+                //var longitude = event.latLng.lng();
+                //var pos = (latitude + ', ' + longitude );
+                console.log(place);
+                // Clear out the old markers.
+                  markers.forEach(function(marker) {
+                    marker.setMap(null);
+                  });
+                markers = [];
+
+                var bounds = new google.maps.LatLngBounds(
+
+                );
+              
+
+                var icon = {
+                  url: place.icon,
+                  size: new google.maps.Size(71, 71),
+                  origin: new google.maps.Point(0, 0),
+                  anchor: new google.maps.Point(17, 34),
+                  scaledSize: new google.maps.Size(25, 25)
+                };
+
+                // Create a marker for each place.
+                markers.push(marker = new google.maps.Marker({
+                  map: map,
+                  icon: icon,
+                  title: place.name,
+                  position: place.geometry.location
+                }));
+
+                // if (places.geometry.viewport) {
+                //   // Only geocodes have viewport.
+                //   bounds.union(place.geometry.viewport);
+                // } else {
+                //   bounds.extend(place.geometry.location);
+                // }
+                document.getElementById("status").innerHTML=place.name;
+                document.getElementById("latlng").innerHTML=place.geometry.location;
+
+                //document.getElementById("status").innerHTML = JSON.stringify(place);
+              
+                              
+              }); 
+
+
+
+            });
+          }
+          map.fitBounds(bounds);
+          document.geocoder = new google.maps.Geocoder();
+          document.map = new google.maps.Map(document.getElementById("map_canvas"));
+          
+          
+        });
+        
+      }
+      //{"formatted_address":"2635 Broadway, New York, NY 10025, USA","geometry":{"location":{"lat":40.7972046,"lng":-73.97032389999998},"viewport":{"south":40.79580922010727,"west":-73.97157227989271,"north":40.79850887989272,"east":-73.96887262010728}},"icon":"https://maps.gstatic.com/mapfiles/place_api/icons/shopping-71.png","id":"eb5aa2a9781f4c17b86bb7891a088810d447c809","name":"H &amp; M News","place_id":"ChIJawr_ESb2wokRC4VdpboHy1U","plus_code":{"compound_code":"Q2WH+VV New York","global_code":"87G8Q2WH+VV"},"rating":1,"reference":"ChIJawr_ESb2wokRC4VdpboHy1U","types":["store","point_of_interest","establishment"],"html_attributions":[]}
+
+
+    </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvuYZ2voWaDxosp8jB7y_xWzZSxpC_Gk4&libraries=places&callback=initAutocomplete"
+        async defer></script>
+</body>
+<!--
+<body onload="initialize()">
+  <div id="map_canvas" style="width:100%; height:100%"></div>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+-->
+</html>

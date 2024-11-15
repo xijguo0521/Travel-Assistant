@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="loginpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Text layoutX="67.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to New Yorker App" underline="true">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Text>
+      <TextField fx:id="txtUsername" layoutX="67.0" layoutY="143.0" promptText="Username" />
+      <PasswordField fx:id="txtPassword" layoutX="250.0" layoutY="143.0" promptText="Password" />
+      <Button fx:id="login" layoutX="67.0" layoutY="197.0" mnemonicParsing="false" onAction="#login" text="Log In" />
+      <Button fx:id="signup" layoutX="135.0" layoutY="197.0" mnemonicParsing="false" onAction="#signup" text="Sign Up" />
+      <Label fx:id="lblStatus" layoutX="67.0" layoutY="99.0" text="Log In or Sign Up to Continue" />
+      <Text layoutX="14.0" layoutY="289.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Made with ♥ by 4for4 ">
+         <font>
+            <Font size="9.0" />
+         </font>
+      </Text>
+   </children>
+</AnchorPane>
