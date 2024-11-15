@@ -1,5 +1,4 @@
-This project is co-developed by Xijie Guo, Yun Wang, Jerry Lin, Haoran Geng
-
+This project is co-developed by Xijie Guo, Yun Wang, Jerry Lin, Haoran Geng in Columbia University W4156 Advanced Software Engineering course.
 # Travel-Assistant
 
 Have you ever found yourself in a new city, having a couple places in mind to visit, but not knowing where to go first? Do you find trip planning sometimes cumbersome and tiring? Not anymore! New Yorker is a trip planning application that can help you instantly plan your day trip based on your preferences!
